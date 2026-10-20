@@ -20,8 +20,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 检查 Android SDK
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-<unset>}"
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-<unset>}"
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
+          ls "${SDK_ROOT}/platforms" 2>/dev/null || echo "platforms 目录不存在"
+          ls "${SDK_ROOT}/build-tools" 2>/dev/null || echo "build-tools 目录不存在"
 
       - name: Prepare project structure
         run: |

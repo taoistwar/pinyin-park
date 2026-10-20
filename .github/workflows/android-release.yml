@@ -29,8 +29,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 设置 Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 检查 Android SDK
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-<unset>}"
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
+          ls "${SDK_ROOT}/platforms" 2>/dev/null || echo "platforms 目录不存在"
+          ls "${SDK_ROOT}/build-tools" 2>/dev/null || echo "build-tools 目录不存在"
 
       - name: 缓存 Gradle
         uses: gradle/actions/setup-gradle@v3
