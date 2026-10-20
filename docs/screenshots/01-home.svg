@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="760" viewBox="0 0 360 760" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <defs>
+    <clipPath id="phoneHome"><rect x="0" y="0" width="360" height="760" rx="22"/></clipPath>
+  </defs>
+  <g clip-path="url(#phoneHome)">
+    <rect x="0" y="0" width="360" height="760" fill="#FFF8E1"/>
+
+    <!-- 状态栏 -->
+    <rect x="0" y="0" width="360" height="24" fill="#FF9800"/>
+    <text x="14" y="17" font-size="11" font-weight="700" fill="#FFFFFF">9:41</text>
+    <rect x="288" y="9" width="14" height="8" rx="2" fill="#FFFFFF"/>
+    <rect x="308" y="7" width="22" height="11" rx="3" fill="none" stroke="#FFFFFF" stroke-width="1.4"/>
+    <rect x="310" y="9" width="14" height="7" rx="1.5" fill="#FFFFFF"/>
+
+    <!-- 顶部标题栏 -->
+    <rect x="0" y="24" width="360" height="56" fill="#FFE5B4"/>
+    <text x="16" y="60" font-size="20" font-weight="700" fill="#3E2723">🐼 拼音乐园</text>
+
+    <!-- 用户进度卡片 -->
+    <rect x="17" y="99" width="328" height="88" rx="12" fill="#000000" opacity="0.06"/>
+    <rect x="16" y="96" width="328" height="88" rx="12" fill="#FFF3E0"/>
+    <text x="32" y="136" font-size="19" font-weight="600" fill="#3E2723">⭐ 12 星星</text>
+    <text x="32" y="162" font-size="12" fill="#8D6E63">🔥 连续 3 天</text>
+    <text x="250" y="133" font-size="19" text-anchor="middle">🏆</text>
+    <text x="250" y="152" font-size="10" fill="#9E9E9E" text-anchor="middle">完成 8 个</text>
+    <text x="312" y="133" font-size="19" text-anchor="middle">🎖️</text>
+    <text x="312" y="152" font-size="10" fill="#9E9E9E" text-anchor="middle">3 枚徽章</text>
+
+    <!-- 学习章节 -->
+    <text x="16" y="212" font-size="15" font-weight="700" fill="#3E2723">📚 学习章节</text>
+
+    <rect x="17" y="223" width="328" height="80" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="16" y="220" width="328" height="80" rx="12" fill="#E3F2FD"/>
+    <circle cx="52" cy="260" r="28" fill="#2196F3"/>
+    <text x="52" y="261" font-size="20" text-anchor="middle" dominant-baseline="central">🅱️</text>
+    <text x="92" y="248" font-size="14" font-weight="600" fill="#3E2723">声母家族</text>
+    <text x="92" y="265" font-size="11" fill="#757575">认识21个声母小伙伴</text>
+    <rect x="92" y="274" width="208" height="6" rx="3" fill="#E0E0E0"/>
+    <rect x="92" y="274" width="79" height="6" rx="3" fill="#4CAF50"/>
+    <text x="92" y="293" font-size="10" fill="#9E9E9E">8/21 已学</text>
+    <text x="316" y="268" font-size="16" text-anchor="middle">▶️</text>
+
+    <rect x="17" y="315" width="328" height="80" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="16" y="312" width="328" height="80" rx="12" fill="#E3F2FD"/>
+    <circle cx="52" cy="352" r="28" fill="#2196F3"/>
+    <text x="52" y="353" font-size="20" text-anchor="middle" dominant-baseline="central">🎵</text>
+    <text x="92" y="340" font-size="14" font-weight="600" fill="#3E2723">韵母乐园</text>
+    <text x="92" y="357" font-size="11" fill="#757575">学会35个韵母</text>
+    <rect x="92" y="366" width="208" height="6" rx="3" fill="#E0E0E0"/>
+    <rect x="92" y="366" width="43" height="6" rx="3" fill="#4CAF50"/>
+    <text x="92" y="385" font-size="10" fill="#9E9E9E">5/24 已学</text>
+    <text x="316" y="360" font-size="16" text-anchor="middle">▶️</text>
+
+    <rect x="17" y="407" width="328" height="80" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="16" y="404" width="328" height="80" rx="12" fill="#E3F2FD"/>
+    <circle cx="52" cy="444" r="28" fill="#2196F3"/>
+    <text x="52" y="445" font-size="20" text-anchor="middle" dominant-baseline="central">🎶</text>
+    <text x="92" y="432" font-size="14" font-weight="600" fill="#3E2723">四声宫殿</text>
+    <text x="92" y="449" font-size="11" fill="#757575">掌握音调变化</text>
+    <rect x="92" y="458" width="208" height="6" rx="3" fill="#E0E0E0"/>
+    <text x="92" y="477" font-size="10" fill="#9E9E9E">0/4 已学</text>
+    <text x="316" y="452" font-size="16" text-anchor="middle">▶️</text>
+
+    <!-- 趣味游戏 -->
+    <text x="16" y="514" font-size="15" font-weight="700" fill="#3E2723">🎮 趣味游戏</text>
+
+    <rect x="17" y="527" width="160" height="104" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="16" y="524" width="160" height="104" rx="12" fill="#FCE4EC"/>
+    <text x="96" y="570" font-size="34" text-anchor="middle">🔗</text>
+    <text x="96" y="596" font-size="13" font-weight="700" fill="#3E2723" text-anchor="middle">拼音配对</text>
+    <text x="96" y="613" font-size="10" fill="#9E9E9E" text-anchor="middle">连线匹配</text>
+
+    <rect x="189" y="527" width="160" height="104" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="188" y="524" width="160" height="104" rx="12" fill="#FCE4EC"/>
+    <text x="268" y="570" font-size="34" text-anchor="middle">🐹</text>
+    <text x="268" y="596" font-size="13" font-weight="700" fill="#3E2723" text-anchor="middle">拼音地鼠</text>
+    <text x="268" y="613" font-size="10" fill="#9E9E9E" text-anchor="middle">快速点击</text>
+
+    <!-- 宠物养成 -->
+    <text x="16" y="656" font-size="15" font-weight="700" fill="#3E2723">🐰 我的小宠物</text>
+
+    <rect x="17" y="671" width="328" height="84" rx="12" fill="#000000" opacity="0.05"/>
+    <rect x="16" y="668" width="328" height="84" rx="12" fill="#F1F8E9"/>
+    <circle cx="56" cy="710" r="32" fill="#A5D6A7"/>
+    <text x="56" y="711" font-size="30" text-anchor="middle" dominant-baseline="central">🐰</text>
+    <text x="100" y="699" font-size="14" font-weight="600" fill="#3E2723">小兔子</text>
+    <text x="100" y="717" font-size="12" fill="#4CAF50">等级 Lv.1</text>
+    <text x="100" y="739" font-size="11">❤️❤️❤️🖤🖤</text>
+    <rect x="268" y="693" width="68" height="34" rx="17" fill="#FF9800"/>
+    <text x="302" y="715" font-size="11" fill="#FFFFFF" text-anchor="middle">🍎 喂食</text>
+  </g>
+</svg>

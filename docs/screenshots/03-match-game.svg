@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="760" viewBox="0 0 360 760" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <defs>
+    <clipPath id="phoneGame"><rect x="0" y="0" width="360" height="760" rx="22"/></clipPath>
+  </defs>
+  <g clip-path="url(#phoneGame)">
+    <rect x="0" y="0" width="360" height="760" fill="#FFF8E1"/>
+
+    <!-- 状态栏 -->
+    <rect x="0" y="0" width="360" height="24" fill="#FF9800"/>
+    <text x="14" y="17" font-size="11" font-weight="700" fill="#FFFFFF">9:41</text>
+    <rect x="288" y="9" width="14" height="8" rx="2" fill="#FFFFFF"/>
+    <rect x="308" y="7" width="22" height="11" rx="3" fill="none" stroke="#FFFFFF" stroke-width="1.4"/>
+    <rect x="310" y="9" width="14" height="7" rx="1.5" fill="#FFFFFF"/>
+
+    <!-- 顶部标题栏 -->
+    <rect x="0" y="24" width="360" height="56" fill="#FCE4EC"/>
+    <path d="M24 44 l14 14 M38 44 l-14 14" stroke="#3E2723" stroke-width="2" stroke-linecap="round"/>
+    <text x="52" y="59" font-size="17" font-weight="600" fill="#3E2723">🔗 拼音配对</text>
+    <rect x="188" y="36" width="62" height="26" rx="8" fill="#4CAF50"/>
+    <text x="219" y="53" font-size="10" fill="#FFFFFF" text-anchor="middle">⏱ 28分钟</text>
+    <text x="258" y="56" font-size="13" fill="#3E2723">得分: 20</text>
+
+    <!-- 提示文案 -->
+    <text x="180" y="110" font-size="14" fill="#757575" text-anchor="middle">把相同的拼音连在一起！</text>
+
+    <!-- 配对网格 -->
+    <!-- 第一行：b 已配对 -->
+    <rect x="32" y="140" width="80" height="80" rx="12" fill="#4CAF50" stroke="#388E3C" stroke-width="2.5"/>
+    <text x="72" y="188" font-size="28" fill="#FFFFFF" text-anchor="middle">✓</text>
+    <rect x="248" y="140" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <text x="288" y="188" font-size="26" font-weight="700" fill="#3E2723" text-anchor="middle">m</text>
+
+    <!-- 第二行：p 已选中（橙色），右侧 d 配对错误（红色） -->
+    <rect x="32" y="240" width="80" height="80" rx="12" fill="#FF9800" stroke="#E65100" stroke-width="2.5"/>
+    <text x="72" y="288" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">p</text>
+    <rect x="248" y="240" width="80" height="80" rx="12" fill="#F44336" stroke="#D32F2F" stroke-width="2.5"/>
+    <text x="288" y="288" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">d</text>
+
+    <!-- 第三行：m 配对错误（红色），右侧 b 已配对 -->
+    <rect x="32" y="340" width="80" height="80" rx="12" fill="#F44336" stroke="#D32F2F" stroke-width="2.5"/>
+    <text x="72" y="388" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">m</text>
+    <rect x="248" y="340" width="80" height="80" rx="12" fill="#4CAF50" stroke="#388E3C" stroke-width="2.5"/>
+    <text x="288" y="388" font-size="28" fill="#FFFFFF" text-anchor="middle">✓</text>
+
+    <!-- 第四行 -->
+    <rect x="32" y="440" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <text x="72" y="488" font-size="26" font-weight="700" fill="#3E2723" text-anchor="middle">f</text>
+    <rect x="248" y="440" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <text x="288" y="488" font-size="26" font-weight="700" fill="#3E2723" text-anchor="middle">f</text>
+
+    <!-- 第五行 -->
+    <rect x="32" y="540" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <text x="72" y="588" font-size="26" font-weight="700" fill="#3E2723" text-anchor="middle">d</text>
+    <rect x="248" y="540" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <text x="288" y="588" font-size="26" font-weight="700" fill="#3E2723" text-anchor="middle">p</text>
+
+    <!-- 中间的连线图标 -->
+    <text x="180" y="392" font-size="34" text-anchor="middle">🔗</text>
+
+    <!-- 底部提示 -->
+    <text x="180" y="680" font-size="11" fill="#9E9E9E" text-anchor="middle">点击左右两侧相同的拼音完成配对</text>
+    <text x="180" y="706" font-size="11" fill="#9E9E9E" text-anchor="middle">每局最多 5 对，全部配对即通关</text>
+  </g>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="760" viewBox="0 0 360 760" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <defs>
+    <clipPath id="phoneVerify"><rect x="0" y="0" width="360" height="760" rx="22"/></clipPath>
+  </defs>
+  <g clip-path="url(#phoneVerify)">
+    <!-- 底层：游戏页面 -->
+    <rect x="0" y="0" width="360" height="760" fill="#FFF8E1"/>
+    <rect x="0" y="0" width="360" height="24" fill="#FF9800"/>
+    <rect x="0" y="24" width="360" height="56" fill="#FCE4EC"/>
+    <text x="52" y="59" font-size="17" font-weight="600" fill="#3E2723">🔗 拼音配对</text>
+    <text x="180" y="110" font-size="14" fill="#757575" text-anchor="middle">把相同的拼音连在一起！</text>
+    <rect x="32" y="140" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="248" y="140" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="32" y="240" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="248" y="240" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="32" y="340" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="248" y="340" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="32" y="440" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="248" y="440" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="32" y="540" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+    <rect x="248" y="540" width="80" height="80" rx="12" fill="#FFFFFF" stroke="#BDBDBD" stroke-width="2.5"/>
+
+    <!-- 遮罩 -->
+    <rect x="0" y="0" width="360" height="760" fill="#000000" opacity="0.4"/>
+
+    <!-- 验证弹窗 -->
+    <rect x="26" y="96" width="312" height="568" rx="28" fill="#000000" opacity="0.18"/>
+    <rect x="24" y="92" width="312" height="568" rx="28" fill="#FFFFFF"/>
+
+    <text x="180" y="152" font-size="36" text-anchor="middle" dominant-baseline="central">🛡️</text>
+    <text x="180" y="196" font-size="16" font-weight="700" fill="#3E2723" text-anchor="middle">👀 眼睛休息一下！</text>
+    <text x="180" y="236" font-size="19" font-weight="600" fill="#3E2723" text-anchor="middle">请选择正确的汉字组合</text>
+    <text x="180" y="262" font-size="12" fill="#9E9E9E" text-anchor="middle">请在下方找出对应的汉字</text>
+
+    <!-- 验证码展示 -->
+    <rect x="48" y="282" width="264" height="104" rx="12" fill="#FFF8E1"/>
+    <text x="180" y="312" font-size="11" fill="#9E9E9E" text-anchor="middle">对应的汉字是：</text>
+    <text x="180" y="362" font-size="38" font-weight="700" fill="#FF9800" text-anchor="middle" letter-spacing="2">壹贰叁肆</text>
+
+    <!-- 选项 -->
+    <rect x="58" y="404" width="116" height="60" rx="12" fill="#FF9800" stroke="#E65100" stroke-width="3"/>
+    <text x="116" y="442" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">壹贰叁肆</text>
+    <rect x="186" y="404" width="116" height="60" rx="12" fill="#F5F5F5" stroke="#E0E0E0" stroke-width="3"/>
+    <text x="244" y="442" font-size="20" font-weight="700" fill="#3E2723" text-anchor="middle">伍陆柒捌</text>
+    <rect x="58" y="476" width="116" height="60" rx="12" fill="#F5F5F5" stroke="#E0E0E0" stroke-width="3"/>
+    <text x="116" y="514" font-size="20" font-weight="700" fill="#3E2723" text-anchor="middle">贰叁肆伍</text>
+    <rect x="186" y="476" width="116" height="60" rx="12" fill="#F5F5F5" stroke="#E0E0E0" stroke-width="3"/>
+    <text x="244" y="514" font-size="20" font-weight="700" fill="#3E2723" text-anchor="middle">玖零壹贰</text>
+
+    <!-- 确认按钮 -->
+    <rect x="58" y="556" width="244" height="48" rx="24" fill="#4CAF50"/>
+    <text x="180" y="586" font-size="17" fill="#FFFFFF" text-anchor="middle">确认</text>
+  </g>
+</svg>

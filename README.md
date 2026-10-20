@@ -78,6 +78,20 @@ PinyinPark/
 
 ---
 
+## 📸 运行效果展示
+
+> 以下界面示意图依据 `android/app/src/main/java/com/pinyinpark/ui` 中的 Compose 布局还原，真机效果以实际构建安装的 APK 为准。
+
+| 学习入口 | 沉浸式学习 |
+|:---:|:---:|
+| ![首页](docs/screenshots/01-home.svg) | ![拼音学习页](docs/screenshots/02-learn.svg) |
+| **首页** · 章节进度条、星星与徽章概览、游戏入口、宠物养成 | **拼音学习页** · 大字号拼音卡片、发音播放、口型动画开关、章节进度 |
+| **互动游戏** | **家长守护** |
+| ![拼音配对游戏](docs/screenshots/03-match-game.svg) | ![防沉迷验证](docs/screenshots/04-verify-dialog.svg) |
+| **拼音配对** · 左右连线配对，选中 / 配对成功 / 配对错误三态反馈，顶栏显示剩余时长与得分 | **防沉迷验证** · 每 3 局弹出，数字转大写汉字点选验证，超时或连错 3 次进入休息提示 |
+
+---
+
 ## ⭐ 奖励系统设计
 
 ```

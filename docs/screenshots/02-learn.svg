@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="760" viewBox="0 0 360 760" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">
+  <defs>
+    <clipPath id="phoneLearn"><rect x="0" y="0" width="360" height="760" rx="22"/></clipPath>
+  </defs>
+  <g clip-path="url(#phoneLearn)">
+    <rect x="0" y="0" width="360" height="760" fill="#FFF8E1"/>
+
+    <!-- 状态栏 -->
+    <rect x="0" y="0" width="360" height="24" fill="#FF9800"/>
+    <text x="14" y="17" font-size="11" font-weight="700" fill="#FFFFFF">9:41</text>
+    <rect x="288" y="9" width="14" height="8" rx="2" fill="#FFFFFF"/>
+    <rect x="308" y="7" width="22" height="11" rx="3" fill="none" stroke="#FFFFFF" stroke-width="1.4"/>
+    <rect x="310" y="9" width="14" height="7" rx="1.5" fill="#FFFFFF"/>
+
+    <!-- 顶部标题栏 -->
+    <rect x="0" y="24" width="360" height="56" fill="#E3F2FD"/>
+    <path d="M30 52 h-14 m6 -6 -6 6 6 6" stroke="#3E2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="56" y="59" font-size="19" font-weight="600" fill="#3E2723">声母家族</text>
+
+    <!-- 章节进度 -->
+    <rect x="16" y="100" width="328" height="8" rx="4" fill="#E0E0E0"/>
+    <rect x="16" y="100" width="47" height="8" rx="4" fill="#4CAF50"/>
+    <text x="180" y="128" font-size="11" fill="#5D4037" text-anchor="middle">3 / 21</text>
+
+    <!-- 拼音主卡片 -->
+    <circle cx="180" cy="266" r="101" fill="#000000" opacity="0.07"/>
+    <circle cx="180" cy="262" r="100" fill="#2196F3"/>
+    <text x="180" y="264" font-size="72" font-weight="700" fill="#FFFFFF" text-anchor="middle">m</text>
+    <text x="180" y="308" font-size="22" fill="#FFFFFF" opacity="0.85" text-anchor="middle">妈</text>
+    <g transform="translate(206,184)">
+      <polygon points="0,10 6,10 14,2 14,30 6,22 0,22" fill="#FFFFFF"/>
+      <path d="M19 8 q7 8 0 16" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M24 3 q11 13 0 26" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- 发音按钮 -->
+    <rect x="96" y="397" width="168" height="56" rx="28" fill="#000000" opacity="0.08"/>
+    <rect x="96" y="394" width="168" height="56" rx="28" fill="#FF9800"/>
+    <g transform="translate(129,414)">
+      <polygon points="0,8 5,8 11,2 11,24 5,18 0,18" fill="#FFFFFF"/>
+      <path d="M15 6 q6 7 0 14" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <text x="150" y="428" font-size="16" fill="#FFFFFF">点击听发音</text>
+
+    <!-- 口型动画开关 -->
+    <rect x="101" y="490" width="52" height="32" rx="16" fill="#4CAF50"/>
+    <circle cx="137" cy="506" r="12" fill="#FFFFFF"/>
+    <text x="163" y="512" font-size="13" fill="#3E2723">显示口型动画</text>
+    <text x="259" y="513" font-size="16">👄</text>
+
+    <!-- 底部导航 -->
+    <rect x="16" y="676" width="120" height="48" rx="24" fill="none" stroke="#BDBDBD" stroke-width="1.5"/>
+    <text x="76" y="705" font-size="14" fill="#9E9E9E" text-anchor="middle">上一个</text>
+    <rect x="204" y="676" width="140" height="48" rx="24" fill="#4CAF50"/>
+    <text x="274" y="705" font-size="14" fill="#FFFFFF" text-anchor="middle">下一个 ▶</text>
+  </g>
+</svg>
