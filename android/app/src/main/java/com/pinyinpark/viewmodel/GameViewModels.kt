@@ -111,8 +111,8 @@ class WhackMoleViewModel : ViewModel() {
                     }
                 }
 
-                // 设置目标拼音
-                val targetPinyin = allPinyin.random()
+                // 目标拼音从本次冒出的地鼠里挑，保证场上一定有一个可击中的目标
+                val targetPinyin = newHoles.mapNotNull { it.currentPinyin }.randomOrNull()
                 _uiState.update {
                     it.copy(holes = newHoles, currentTarget = targetPinyin)
                 }
@@ -197,7 +197,8 @@ class WhackMoleViewModel : ViewModel() {
 
     private fun endGame() {
         val state = _uiState.value
-        val maxPossibleScore = state.correctHits * 10  // 粗略计算
+        // 60 秒内大约可完成 20 次正确击打，用作满分基准（此前用正确数×10，会导致得分永远等于满分）
+        val maxPossibleScore = 20 * 10
         val starsEarned = when {
             state.correctHits >= 15 -> 3
             state.correctHits >= 10 -> 2

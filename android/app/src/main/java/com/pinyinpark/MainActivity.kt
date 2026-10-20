@@ -70,12 +70,19 @@ fun PinyinParkApp() {
                             onComplete = { currentScreen = AppScreen.Home }
                         )
                     }
-                    // 其他游戏类型可扩展
+
+                    GameType.WHACK_MOLE -> {
+                        WhackMoleGameScreen(
+                            onBack = { currentScreen = AppScreen.Home }
+                        )
+                    }
+
+                    // 尚未实现的游戏：给出占位页，避免空白
                     else -> {
-                        // 敬请期待页面
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            // TODO: 实现其他游戏
-                        }
+                        ComingSoonScreen(
+                            gameType = screen.gameType,
+                            onBack = { currentScreen = AppScreen.Home }
+                        )
                     }
                 }
             }
