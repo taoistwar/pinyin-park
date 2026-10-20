@@ -137,13 +137,20 @@ PinyinPark/
 
 ## 📲 Android 安装指南
 
-### 方式一：使用 Android Studio
+### 方式一：直接下载已签名 APK（推荐）
+前往 [Releases](https://github.com/taoistwar/pinyin-park/releases) 下载最新 `pinyin-park-v*.apk`：
+- 使用固定发布密钥签名，可覆盖安装升级
+- 适合直接装到手机上给孩子用（需允许「未知来源应用」）
+
+发布流程（打 `v*` 标签自动构建）见 [固定密钥发布指南](docs/GITHUB-BUILD.md)。
+
+### 方式二：使用 Android Studio
 1. 打开 Android Studio → `File` → `Open` → 选择 `android` 文件夹
 2. 等待 Gradle 同步完成
 3. `Build` → `Build APK(s)` → `Build APK`
 4. 将 APK 安装到手机或通过 `adb install` 安装
 
-### 方式二：使用构建脚本
+### 方式三：使用构建脚本
 ```powershell
 cd android
 .\build.bat

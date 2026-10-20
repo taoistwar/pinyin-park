@@ -1,7 +1,29 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+// ============================================================
+// 发布签名配置
+// 本地构建：android/keystore.properties
+// CI 构建：环境变量 KEYSTORE_FILE / KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD
+// 两者都没有时，release 输出未签名 APK（仅用于本地验证）
+// ============================================================
+
+val keystoreProperties = Properties().apply {
+    val propFile = rootProject.file("keystore.properties")
+    if (propFile.exists()) propFile.inputStream().use { load(it) }
+}
+
+fun signingProperty(key: String, envName: String): String? =
+    keystoreProperties.getProperty(key) ?: System.getenv(envName)
+
+val releaseStoreFile = signingProperty("storeFile", "KEYSTORE_FILE")
+    ?.takeIf { it.isNotBlank() }
+    ?.let { rootProject.file(it) }
+val hasReleaseKeystore = releaseStoreFile?.exists() == true
 
 android {
     namespace = "com.pinyinpark"
@@ -11,11 +33,25 @@ android {
         applicationId = "com.pinyinpark"
         minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        // CI 通过环境变量注入版本号，本地默认 1 / 1.0.0
+        versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
+        versionName = System.getenv("VERSION_NAME") ?: "1.0.0"
 
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (hasReleaseKeystore) {
+                storeFile = releaseStoreFile
+                storePassword = signingProperty("storePassword", "KEYSTORE_PASSWORD")
+                keyAlias = signingProperty("keyAlias", "KEY_ALIAS")
+                keyPassword = signingProperty("keyPassword", "KEY_PASSWORD")
+                enableV1Signing = true
+                enableV2Signing = true
+            }
         }
     }
 
@@ -26,6 +62,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // 有固定密钥时才签名，避免本地无密钥时构建中断
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             isDebuggable = true

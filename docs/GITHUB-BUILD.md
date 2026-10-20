@@ -90,6 +90,80 @@ git remote set-url origin https://你的TOKEN@github.com/handyily/pinyin-park.gi
 
 ---
 
+## 🔑 使用固定密钥发布 APK（GitHub Release）
+
+release 包必须使用**同一把密钥**签名，否则新版本无法覆盖安装到旧版本之上。
+[`.github/workflows/android-release.yml`](../.github/workflows/android-release.yml) 从仓库 Secrets 读取密钥来签名，密钥本身**不入库**。
+
+### 步骤 1：生成密钥（只需一次）
+
+密钥已生成在 `android/keystore/release.jks`（已被 `.gitignore` 忽略）。如需重新生成：
+
+```powershell
+keytool -genkeypair -v -keystore android/keystore/release.jks `
+  -alias pinyinpark -keyalg RSA -keysize 2048 -validity 10000 `
+  -storetype PKCS12 -storepass <密钥库密码> -keypass <密钥密码> `
+  -dname "CN=PinyinPark, OU=Mobile, O=PinyinPark, L=Beijing, ST=Beijing, C=CN"
+```
+
+转成单行 base64（用于 Secret）：
+
+```powershell
+$b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("android/keystore/release.jks"))
+Set-Content "android/keystore/release.jks.base64.txt" $b64 -NoNewline -Encoding ascii
+```
+
+> ⚠️ 密钥文件与密码务必自行备份，丢失后无法为已发布的应用签名新版本。
+
+### 步骤 2：配置 4 个 Secrets
+
+仓库 → `Settings` → `Secrets and variables` → `Actions` → `New repository secret`：
+
+| Secret 名称 | 值 |
+|---|---|
+| `KEYSTORE_BASE64` | `release.jks.base64.txt` 的完整内容（单行，无换行） |
+| `KEYSTORE_PASSWORD` | 密钥库密码 |
+| `KEY_ALIAS` | `pinyinpark` |
+| `KEY_PASSWORD` | 密钥密码（PKCS12 格式与密钥库密码相同） |
+
+已安装 [GitHub CLI](https://cli.github.com/) 时也可用命令行：
+
+```powershell
+gh secret set KEYSTORE_BASE64 --repo taoistwar/pinyin-park < android/keystore/release.jks.base64.txt
+gh secret set KEYSTORE_PASSWORD --repo taoistwar/pinyin-park
+gh secret set KEY_ALIAS --repo taoistwar/pinyin-park --body "pinyinpark"
+gh secret set KEY_PASSWORD --repo taoistwar/pinyin-park
+```
+
+### 步骤 3：打标签触发发布
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+也可在 `Actions` → `Android Release` → `Run workflow` 手动执行并填写版本号。
+
+工作流会依次完成：解析版本号 → 写入密钥 → `assembleRelease` → `apksigner verify` 校验签名 → 创建 GitHub Release 并上传 `pinyin-park-v1.0.0.apk` 与 `mapping.txt`。
+
+`versionCode` 由标签自动推导（`1.2.3` → `10203`），每次发版都会递增，保证手机端可覆盖升级。
+
+### 步骤 4：本地签名构建（可选）
+
+`android/keystore.properties`（已被忽略）内容示例：
+
+```properties
+storeFile=keystore/release.jks
+storePassword=<密钥库密码>
+keyAlias=pinyinpark
+keyPassword=<密钥密码>
+```
+
+然后执行 `cd android && ./gradlew assembleRelease`，产物在 `android/app/build/outputs/apk/release/app-release.apk`。
+未提供密钥时，release 任务只产出未签名 APK，不会中断构建。
+
+---
+
 ## 🎯 完成后
 
 恭喜！你现在拥有：
@@ -97,3 +171,4 @@ git remote set-url origin https://你的TOKEN@github.com/handyily/pinyin-park.gi
 - ✅ 自动构建系统
 - ✅ 可下载的 APK 安装包
 - ✅ 每次推送自动重新构建
+- ✅ 固定密钥签名的 Release APK
