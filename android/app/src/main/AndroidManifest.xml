@@ -4,6 +4,13 @@
     <!-- 权限：语音识别（麦克风） -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Android 11+ 需要显式声明，否则 TextToSpeech 绑定不到系统语音引擎 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

@@ -127,7 +127,8 @@ data class LearnUiState(
     val isPlayingAudio: Boolean = false,
     val showMouthShape: Boolean = false,
     val starsEarned: Int = 0,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val audioUnavailable: Boolean = false  // 设备缺少中文语音引擎时提示一次
 )
 
 class LearnViewModel(private val chapter: LessonChapter, private val audioPlayer: AudioPlayerManager? = null) : ViewModel() {
@@ -159,12 +160,41 @@ class LearnViewModel(private val chapter: LessonChapter, private val audioPlayer
 
     fun playAudio() {
         val item = _uiState.value.currentItem ?: return
-        _uiState.update { it.copy(isPlayingAudio = true) }
-        audioPlayer?.playPinyin(item.character, item.exampleWord)
-            ?: viewModelScope.launch {
-                kotlinx.coroutines.delay(1500)
-                _uiState.update { it.copy(isPlayingAudio = false) }
+        val player = audioPlayer
+        if (player == null) {
+            _uiState.update { it.copy(isPlayingAudio = false, audioUnavailable = true) }
+            return
+        }
+
+        _uiState.update { it.copy(isPlayingAudio = true, audioUnavailable = false) }
+        // TTS 用示例汉字朗读最稳定（汉字能保证按中文读；直接读 "mā" 可能被逐字母拼读）
+        val started = player.playPinyin(
+            pinyinChar = item.character,
+            exampleWord = item.exampleWord
+        )
+
+        if (!started) {
+            _uiState.update { it.copy(isPlayingAudio = false, audioUnavailable = true) }
+            return
+        }
+
+        // 兜底：引擎没真正出声（例如未安装中文语音包）时恢复按钮状态
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(2500)
+            if (!player.isCurrentlyPlaying()) {
+                _uiState.update {
+                    it.copy(
+                        isPlayingAudio = false,
+                        audioUnavailable = !player.isTtsAvailable()
+                    )
+                }
             }
+        }
+    }
+
+    /** 提示只弹一次 */
+    fun consumeAudioUnavailable() {
+        _uiState.update { it.copy(audioUnavailable = false) }
     }
 
     fun playExampleWord() {

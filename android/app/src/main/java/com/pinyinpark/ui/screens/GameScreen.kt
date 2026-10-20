@@ -1,5 +1,6 @@
 package com.pinyinpark.ui.screens
 
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -14,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import com.pinyinpark.model.*
+import com.pinyinpark.util.AudioPlayerManager
 import com.pinyinpark.viewmodel.*
 import com.pinyinpark.ui.components.*
 
@@ -29,11 +32,30 @@ import com.pinyinpark.ui.components.*
 @Composable
 fun LearnScreen(
     chapter: LessonChapter,
-    viewModel: LearnViewModel = remember { LearnViewModel(chapter) },
     onBack: () -> Unit = {},
     onComplete: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
+    // 音频播放器与页面同生命周期，负责发音（无本地音频时走系统 TTS）
+    val audioPlayer = remember(chapter.id) { AudioPlayerManager(context) }
+    DisposableEffect(audioPlayer) {
+        onDispose { audioPlayer.release() }
+    }
+    val viewModel = remember(chapter.id) { LearnViewModel(chapter, audioPlayer) }
     val uiState by viewModel.uiState.collectAsState()
+
+    // 设备缺少中文语音引擎时提示一次
+    LaunchedEffect(uiState.audioUnavailable) {
+        if (uiState.audioUnavailable) {
+            Toast.makeText(
+                context,
+                "未找到中文语音引擎，请在「设置 → 文字转语音」中安装或启用中文语音包",
+                Toast.LENGTH_LONG
+            ).show()
+            viewModel.consumeAudioUnavailable()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -77,29 +99,50 @@ fun LearnScreen(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             uiState.currentItem?.let { item ->
-                // 主拼音卡片
-                PinyinCard(item = item, isPlaying = uiState.isPlayingAudio)
+                // 中间内容可滚动，避免展开口型动画后在小屏设备上被裁掉
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // 主拼音卡片
+                    PinyinCard(item = item, isPlaying = uiState.isPlayingAudio)
 
-                Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
 
-                // 播放音频按钮
-                PlayAudioButton(
-                    onClick = { viewModel.playAudio() },
-                    isPlaying = uiState.isPlayingAudio
-                )
+                    // 播放音频按钮
+                    PlayAudioButton(
+                        onClick = { viewModel.playAudio() },
+                        isPlaying = uiState.isPlayingAudio
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                // 口型动画开关
-                MouthShapeToggle(
-                    showMouthShape = uiState.showMouthShape,
-                    onToggle = { viewModel.toggleMouthShape() }
-                )
+                    // 口型动画开关
+                    MouthShapeToggle(
+                        showMouthShape = uiState.showMouthShape,
+                        onToggle = { viewModel.toggleMouthShape() }
+                    )
 
-                Spacer(modifier = Modifier.weight(1f))
+                    // 口型动画展示区
+                    AnimatedVisibility(
+                        visible = uiState.showMouthShape,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        MouthShapeIndicator(
+                            pinyin = uiState.currentItem?.character.orEmpty(),
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
                 // 底部导航按钮
                 NavigationButtons(
