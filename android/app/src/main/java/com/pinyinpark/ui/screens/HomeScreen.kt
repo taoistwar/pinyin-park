@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +31,9 @@ import com.pinyinpark.viewmodel.*
 fun HomeScreen(
     viewModel: HomeViewModel = remember { HomeViewModel() },
     onChapterClick: (LessonChapter) -> Unit = {},
-    onGameClick: (GameType) -> Unit = {}
+    onGameClick: (GameType) -> Unit = {},
+    onBadgesClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -36,6 +41,14 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("🐼 拼音乐园", fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = onBadgesClick) {
+                        Icon(Icons.Default.EmojiEvents, contentDescription = "勋章墙")
+                    }
+                    IconButton(onClick = onProfileClick) {
+                        Icon(Icons.Default.Person, contentDescription = "我的")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFFFE5B4)
                 )
@@ -81,7 +94,11 @@ fun HomeScreen(
 
             // 宠物养成区
             SectionTitle("🐰 我的小宠物")
-            PetCard(uiState.userProgress.petLevel)
+            PetCard(
+                petLevel = uiState.userProgress.petLevel,
+                hunger = uiState.petHunger,
+                onFeed = { viewModel.feedPet() }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -231,7 +248,7 @@ fun GameCard(gameType: GameType, onClick: () -> Unit) {
 // ============================================================
 
 @Composable
-fun PetCard(petLevel: Int) {
+fun PetCard(petLevel: Int, hunger: Int = 100, onFeed: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -269,9 +286,24 @@ fun PetCard(petLevel: Int) {
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(6.dp))
+                LinearProgressIndicator(
+                    progress = { hunger / 100f },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
+                    color = Color(0xFFFF9800),
+                    trackColor = Color(0xFFE0E0E0)
+                )
+                Text(
+                    "饱食度 $hunger%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
             }
 
-            Button(onClick = { /* 喂养 */ }) {
+            Button(onClick = onFeed) {
                 Text("🍎 喂食")
             }
         }

@@ -111,6 +111,20 @@ class HomeViewModel : ViewModel() {
         // 导航到章节详情（由导航层处理）
     }
 
+    /**
+     * 喂食宠物：提升饱食度并给出反馈
+     */
+    fun feedPet() {
+        _uiState.update { state ->
+            val newHunger = minOf(100, state.petHunger + 20)
+            state.copy(
+                petHunger = newHunger,
+                showCelebration = true,
+                celebrationMessage = "小拼吃饱啦！饱食度 $newHunger%"
+            )
+        }
+    }
+
     fun dismissCelebration() {
         _uiState.update { it.copy(showCelebration = false) }
     }

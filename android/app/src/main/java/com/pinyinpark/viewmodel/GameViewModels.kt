@@ -3,6 +3,7 @@ package com.pinyinpark.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pinyinpark.model.*
+import com.pinyinpark.util.AudioPlayerManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -248,7 +249,9 @@ data class SpeechResult(
     val confidence: Float  // 置信度 0-1
 )
 
-class SpeakRepeatViewModel : ViewModel() {
+class SpeakRepeatViewModel(
+    private val audioPlayer: AudioPlayerManager? = null
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SpeakRepeatUiState())
     val uiState: StateFlow<SpeakRepeatUiState> = _uiState.asStateFlow()
@@ -281,42 +284,70 @@ class SpeakRepeatViewModel : ViewModel() {
     }
 
     fun playCurrentAudio() {
+        val item = _uiState.value.currentItem ?: return
         _uiState.update { it.copy(isPlayingAudio = true) }
-        // TODO: 调用 AudioPlayerManager 播放音频
+
+        val player = audioPlayer
+        if (player == null) {
+            viewModelScope.launch {
+                delay(1200)
+                _uiState.update { it.copy(isPlayingAudio = false) }
+            }
+            return
+        }
+
+        player.playPinyin(pinyinChar = item.character, exampleWord = item.exampleWord)
+        // 兜底复位，避免按钮一直停在「播放中」
         viewModelScope.launch {
-            delay(1500)
-            _uiState.update { it.copy(isPlayingAudio = false) }
+            delay(3000)
+            if (!player.isCurrentlyPlaying()) {
+                _uiState.update { it.copy(isPlayingAudio = false) }
+            }
         }
     }
 
+    /** 进入「聆听中」状态，真正的录音由界面调用系统语音识别完成 */
     fun startListening() {
         _uiState.update { it.copy(isListening = true, speechResult = null) }
-        // TODO: 调用语音识别 API
-        // 这里模拟识别结果
-        viewModelScope.launch {
-            delay(2000)
-            val item = _uiState.value.currentItem
-            val isCorrect = Random.nextBoolean()  // 模拟识别结果
-            val result = SpeechResult(
-                recognizedText = if (isCorrect) item?.character ?: "" else "识别失败",
-                isCorrect = isCorrect,
-                confidence = if (isCorrect) 0.9f else 0.3f
+    }
+
+    /** 系统语音识别返回结果 */
+    fun onSpeechResult(recognizedText: String?) {
+        val item = _uiState.value.currentItem
+        val text = recognizedText?.trim().orEmpty()
+
+        val isCorrect = item != null && text.isNotEmpty() && (
+            text.contains(item.exampleWord) ||
+                text.contains(item.character) ||
+                (item.examplePinyin.isNotBlank() && text.contains(item.examplePinyin))
             )
 
-            val state = _uiState.value
-            val newScore = if (isCorrect) state.score + 10 else state.score
-            val newCorrectCount = if (isCorrect) state.correctCount + 1 else state.correctCount
-            val newWrongCount = if (!isCorrect) state.wrongCount + 1 else state.wrongCount
+        applySpeechResult(
+            SpeechResult(
+                recognizedText = text,
+                isCorrect = isCorrect,
+                confidence = if (isCorrect) 0.9f else 0.4f
+            )
+        )
+    }
 
-            _uiState.update {
-                it.copy(
-                    isListening = false,
-                    speechResult = result,
-                    score = newScore,
-                    correctCount = newCorrectCount,
-                    wrongCount = newWrongCount
-                )
-            }
+    /** 识别失败 / 用户取消，按「没听清」处理 */
+    fun onSpeechError() {
+        applySpeechResult(
+            SpeechResult(recognizedText = "", isCorrect = false, confidence = 0f)
+        )
+    }
+
+    private fun applySpeechResult(result: SpeechResult) {
+        val state = _uiState.value
+        _uiState.update {
+            it.copy(
+                isListening = false,
+                speechResult = result,
+                score = if (result.isCorrect) state.score + 10 else state.score,
+                correctCount = if (result.isCorrect) state.correctCount + 1 else state.correctCount,
+                wrongCount = if (!result.isCorrect) state.wrongCount + 1 else state.wrongCount
+            )
         }
     }
 
@@ -371,6 +402,7 @@ data class BlockPuzzleUiState(
     val targetPinyin: String = "",           // 目标拼音
     val targetExample: String = "",            // 目标例词
     val targetChar: String = "",               // 目标汉字
+    val targetTone: String = "1",              // 目标声调 1-4
     val placedBlocks: List<PlacedBlock> = emptyList(),  // 已放置的积木
     val availableBlocks: List<PuzzleBlock> = emptyList(), // 可用积木
     val isComplete: Boolean = false,           // 是否完成
@@ -421,8 +453,9 @@ class BlockPuzzleViewModel : ViewModel() {
         }
 
         val item = puzzleData[index]
-        // 分解拼音为声母、韵母、声调
-        val (initial, final, tone) = parsePinyin(item.character)
+        // 分解拼音为声母、韵母（音节本身不带调号，声调取自例词拼音）
+        val (initial, final, _) = parsePinyin(item.character)
+        val tone = parsePinyin(item.examplePinyin).third
 
         // 生成干扰项
         val allInitials = PinyinData.shengMuList.map { it.character }
@@ -442,12 +475,17 @@ class BlockPuzzleViewModel : ViewModel() {
         blocks.addAll(allFinals.filter { it != final }.shuffled().take(2).map {
             PuzzleBlock("f_$it", it, BlockType.FINAL)
         })
+        // 声调干扰项
+        blocks.addAll(listOf("1", "2", "3", "4").filter { it != tone }.shuffled().take(1).map {
+            PuzzleBlock("t_$it", it, BlockType.TONE)
+        })
 
         _uiState.update {
             it.copy(
                 targetPinyin = item.character,
                 targetExample = item.exampleWord,
                 targetChar = item.character,
+                targetTone = tone,
                 placedBlocks = listOf(
                     PlacedBlock(0, null),
                     PlacedBlock(1, null),
@@ -569,7 +607,6 @@ class BlockPuzzleViewModel : ViewModel() {
         val placed1 = state.placedBlocks.find { it.position == 1 }?.block?.text ?: ""
         val placed2 = state.placedBlocks.find { it.position == 2 }?.block?.text ?: ""
 
-        val currentAnswer = placed0 + placed1 + placed2
         val targetAnswer = state.targetPinyin.replace(Regex("[āáǎàēéěèīíǐìōóǒòūúǔùüǖǘǚǜ]")) {
             when (it.value) {
                 "ā", "á", "ǎ", "à" -> "a"
@@ -583,8 +620,9 @@ class BlockPuzzleViewModel : ViewModel() {
         }
 
         if (placed0.isNotEmpty() && placed1.isNotEmpty() && placed2.isNotEmpty()) {
-            val isCorrect = currentAnswer == targetAnswer ||
-                (currentAnswer == state.targetPinyin)
+            // 声母 + 韵母要拼出目标音节，声调要选对
+            val letterAnswer = placed0 + placed1
+            val isCorrect = letterAnswer == targetAnswer && placed2 == state.targetTone
 
             if (isCorrect) {
                 val newScore = state.score + 20
@@ -647,6 +685,8 @@ data class ChainGameUiState(
     val currentPinyin: String = "",
     val currentExample: String = "",
     val currentChar: String = "",
+    val currentFinal: String = "",                   // 当前拼音的韵母（下一个要接这个韵母）
+    val candidates: List<PinyinItem> = emptyList(),  // 可选的接龙候选
     val historyPinyins: List<String> = emptyList(),
     val score: Int = 0,
     val chainLength: Int = 0,
@@ -721,6 +761,8 @@ class ChainGameViewModel : ViewModel() {
                 currentPinyin = startItem.character,
                 currentExample = startItem.exampleWord,
                 currentChar = startItem.character,
+                currentFinal = final,
+                candidates = buildCandidates(),
                 historyPinyins = listOf(startItem.character),
                 score = 0,
                 chainLength = 1,
@@ -730,6 +772,25 @@ class ChainGameViewModel : ViewModel() {
                 result = null
             )
         }
+    }
+
+    /**
+     * 生成候选拼音：至少包含一个可接龙的正确答案，再混入干扰项
+     */
+    private fun buildCandidates(): List<PinyinItem> {
+        val pool = PinyinData.combinedList
+
+        val correct = pool.filter { item ->
+            !usedPinyins.contains(item.character) &&
+                parsePinyin(item.character).second == lastFinal
+        }.shuffled().take(2)
+
+        val distractors = pool.filter { item ->
+            !usedPinyins.contains(item.character) &&
+                parsePinyin(item.character).second != lastFinal
+        }.shuffled().take(6)
+
+        return (correct + distractors).shuffled()
     }
 
     private fun parsePinyin(pinyin: String): Pair<String, String> {
@@ -828,6 +889,8 @@ class ChainGameViewModel : ViewModel() {
                 currentPinyin = item.character,
                 currentExample = item.exampleWord,
                 currentChar = item.character,
+                currentFinal = final,
+                candidates = buildCandidates(),
                 historyPinyins = it.historyPinyins + item.character,
                 score = newScore,
                 chainLength = newChain,
@@ -842,10 +905,9 @@ class ChainGameViewModel : ViewModel() {
     }
 
     private fun checkIfStuck() {
-        // 查找可以接龙的下一个拼音
+        // 查找可以接龙的下一个拼音（韵母相同且未被使用）
         val availableItems = PinyinData.combinedList.filter { item ->
             !usedPinyins.contains(item.character) &&
-                item.character.startsWith(lastFinal) ||
                 parsePinyin(item.character).second == lastFinal
         }
 
@@ -933,34 +995,45 @@ class MazeAdventureViewModel : ViewModel() {
     }
 
     private fun generateMaze() {
-        // 简单迷宫生成算法
-        val maze = MutableList(mazeSize) { y ->
-            MutableList(mazeSize) { x ->
-                // 边缘是墙
-                if (x == 0 || y == 0 || x == mazeSize - 1 || y == mazeSize - 1) {
-                    Cell(CellType.WALL)
-                } else {
-                    // 随机生成墙
-                    if (Random.nextFloat() < 0.3f) {
-                        Cell(CellType.WALL)
-                    } else {
-                        Cell(CellType.PATH)
-                    }
+        // 1) 全部置为墙，再挖出一条必然连通的路径，避免终点被墙封死
+        val maze = MutableList(mazeSize) {
+            MutableList(mazeSize) { Cell(CellType.WALL) }
+        }
+
+        var pathX = 1
+        var pathY = 1
+        maze[pathY][pathX] = Cell(CellType.PATH)
+        while (pathX < mazeSize - 2 || pathY < mazeSize - 2) {
+            val canRight = pathX < mazeSize - 2
+            val canDown = pathY < mazeSize - 2
+            val goRight = when {
+                canRight && canDown -> Random.nextBoolean()
+                canRight -> true
+                else -> false
+            }
+            if (goRight) pathX++ else pathY++
+            maze[pathY][pathX] = Cell(CellType.PATH)
+        }
+
+        // 2) 随机打通部分墙壁，形成岔路
+        for (row in 1 until mazeSize - 1) {
+            for (col in 1 until mazeSize - 1) {
+                if (maze[row][col].type == CellType.WALL && Random.nextFloat() < 0.4f) {
+                    maze[row][col] = Cell(CellType.PATH)
                 }
             }
         }
 
-        // 设置起点和终点
+        // 3) 起点与终点
         maze[1][1] = Cell(CellType.START)
         maze[mazeSize - 2][mazeSize - 2] = Cell(CellType.TARGET)
 
-        // 在路径上放置拼音
+        // 4) 在路径上放置拼音
         val pinyinItems = allPinyinItems.shuffled().toMutableList()
-        maze.forEachIndexed { y, row ->
-            row.forEachIndexed { x, cell ->
-                if (cell.type == CellType.PATH && pinyinItems.isNotEmpty() &&
-                    !(x == 1 && y == 1) && !(x == mazeSize - 2 && y == mazeSize - 2)) {
-                    maze[y][x] = Cell(CellType.PATH, pinyinItems.removeAt(0))
+        for (row in 0 until mazeSize) {
+            for (col in 0 until mazeSize) {
+                if (maze[row][col].type == CellType.PATH && pinyinItems.isNotEmpty()) {
+                    maze[row][col] = Cell(CellType.PATH, pinyinItems.removeAt(0))
                 }
             }
         }

@@ -3,7 +3,8 @@ package com.pinyinpark
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.pinyinpark.model.*
@@ -50,7 +51,9 @@ fun PinyinParkApp() {
                     },
                     onGameClick = { gameType ->
                         currentScreen = AppScreen.Game(gameType)
-                    }
+                    },
+                    onBadgesClick = { currentScreen = AppScreen.Badges },
+                    onProfileClick = { currentScreen = AppScreen.Profile }
                 )
             }
 
@@ -63,27 +66,22 @@ fun PinyinParkApp() {
             }
 
             is AppScreen.Game -> {
+                val backToHome = { currentScreen = AppScreen.Home }
                 when (screen.gameType) {
-                    GameType.MATCHING -> {
-                        MatchGameScreen(
-                            onBack = { currentScreen = AppScreen.Home },
-                            onComplete = { currentScreen = AppScreen.Home }
-                        )
-                    }
+                    GameType.MATCHING -> MatchGameScreen(
+                        onBack = backToHome,
+                        onComplete = { backToHome() }
+                    )
 
-                    GameType.WHACK_MOLE -> {
-                        WhackMoleGameScreen(
-                            onBack = { currentScreen = AppScreen.Home }
-                        )
-                    }
+                    GameType.WHACK_MOLE -> WhackMoleGameScreen(onBack = backToHome)
 
-                    // 尚未实现的游戏：给出占位页，避免空白
-                    else -> {
-                        ComingSoonScreen(
-                            gameType = screen.gameType,
-                            onBack = { currentScreen = AppScreen.Home }
-                        )
-                    }
+                    GameType.SPEAK_REPEAT -> SpeakRepeatGameScreen(onBack = backToHome)
+
+                    GameType.BLOCK_PUZZLE -> BlockPuzzleGameScreen(onBack = backToHome)
+
+                    GameType.CHAIN_GAME -> ChainGameScreen(onBack = backToHome)
+
+                    GameType.MAZE_ADVENTURE -> MazeAdventureGameScreen(onBack = backToHome)
                 }
             }
 
@@ -96,22 +94,4 @@ fun PinyinParkApp() {
             }
         }
     }
-}
-
-// ============================================================
-// 徽章墙页面
-// ============================================================
-
-@Composable
-fun BadgesScreen(onBack: () -> Unit) {
-    // TODO: 实现徽章展示
-}
-
-// ============================================================
-// 个人中心页面
-// ============================================================
-
-@Composable
-fun ProfileScreen(onBack: () -> Unit) {
-    // TODO: 实现个人中心
 }
