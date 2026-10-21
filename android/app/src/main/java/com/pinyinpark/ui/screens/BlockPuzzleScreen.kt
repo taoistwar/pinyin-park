@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pinyinpark.data.rememberUserProgressRepository
 import com.pinyinpark.viewmodel.BlockPuzzleViewModel
 import com.pinyinpark.viewmodel.BlockType
 import com.pinyinpark.viewmodel.PlacedBlock
@@ -34,6 +35,15 @@ fun BlockPuzzleGameScreen(
     onBack: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    val repository = rememberUserProgressRepository()
+    LaunchedEffect(uiState.isGameOver) {
+        if (uiState.isGameOver) {
+            uiState.result?.let { result ->
+                repository.recordGame(result.starsEarned, result.isPerfect)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

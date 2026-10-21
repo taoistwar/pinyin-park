@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +20,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pinyinpark.data.rememberUserProgressRepository
+import com.pinyinpark.model.UserProgress
 
 // ============================================================
 // 个人中心
@@ -27,6 +31,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ProfileScreen(onBack: () -> Unit = {}) {
     val context = LocalContext.current
+    val repository = rememberUserProgressRepository()
+    val progress by repository.progress.collectAsState(initial = UserProgress())
     val versionName = remember {
         runCatching {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
@@ -86,16 +92,20 @@ fun ProfileScreen(onBack: () -> Unit = {}) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatCard("⭐", "12", "星星", Modifier.weight(1f))
-                StatCard("🔥", "3", "连续天数", Modifier.weight(1f))
-                StatCard("🎖️", "1", "徽章", Modifier.weight(1f))
+                StatCard("⭐", progress.totalStars.toString(), "星星", Modifier.weight(1f))
+                StatCard("🔥", progress.streakDays.toString(), "连续天数", Modifier.weight(1f))
+                StatCard("🎖️", progress.unlockedBadges.size.toString(), "徽章", Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
             InfoCard(
                 title = "🐰 我的宠物",
-                lines = listOf("小拼 Lv.1", "在首页点「喂食」可以喂它吃东西")
+                lines = listOf(
+                    "小拼 Lv.${progress.petLevel}",
+                    "饱食度 ${progress.petHunger}%",
+                    "在首页点「喂食」可以喂它吃东西"
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))

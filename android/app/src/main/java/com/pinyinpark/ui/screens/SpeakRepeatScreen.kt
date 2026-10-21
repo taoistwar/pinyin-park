@@ -24,8 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pinyinpark.data.rememberUserProgressRepository
 import com.pinyinpark.util.AudioPlayerManager
 import com.pinyinpark.viewmodel.SpeakRepeatViewModel
+import kotlinx.coroutines.launch
 
 // ============================================================
 // 跟我读游戏页面
@@ -44,6 +46,20 @@ fun SpeakRepeatGameScreen(onBack: () -> Unit = {}) {
     val viewModel = remember { SpeakRepeatViewModel(audioPlayer) }
     val uiState by viewModel.uiState.collectAsState()
 
+    val repository = rememberUserProgressRepository()
+    val scope = rememberCoroutineScope()
+
+    // 没有语音识别 / 识别被取消时，改为家长自评
+    var showSelfCheck by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isGameOver) {
+        if (uiState.isGameOver) {
+            uiState.result?.let { result ->
+                repository.recordGame(result.starsEarned, result.isPerfect)
+            }
+        }
+    }
+
     // 系统语音识别（RecognizerIntent 由系统/第三方识别应用负责录音权限）
     val recognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -53,8 +69,12 @@ fun SpeakRepeatGameScreen(onBack: () -> Unit = {}) {
                 ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                 ?.firstOrNull()
             viewModel.onSpeechResult(spoken)
+            if (!spoken.isNullOrBlank()) {
+                scope.launch { repository.markSpoken() }
+            }
         } else {
             viewModel.onSpeechError()
+            showSelfCheck = true
         }
     }
 
@@ -68,13 +88,15 @@ fun SpeakRepeatGameScreen(onBack: () -> Unit = {}) {
             putExtra(RecognizerIntent.EXTRA_PROMPT, "请跟着读一遍")
         }
         viewModel.startListening()
+        showSelfCheck = false
         try {
             recognizerLauncher.launch(intent)
         } catch (e: ActivityNotFoundException) {
             viewModel.onSpeechError()
+            showSelfCheck = true
             Toast.makeText(
                 context,
-                "设备没有语音识别服务，可以先「听一听」跟读练习",
+                "设备没有语音识别服务，可以用下面的按钮自己判断",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -181,6 +203,7 @@ fun SpeakRepeatGameScreen(onBack: () -> Unit = {}) {
                     val text = when {
                         result.isCorrect -> "✅ 读得真好！"
                         result.recognizedText.isBlank() -> "🤔 没听清，再试一次吧"
+                        result.recognizedText.startsWith("自评") -> result.recognizedText
                         else -> "❌ 听到的是「${result.recognizedText}」，再试一次"
                     }
                     val color = if (result.isCorrect) Color(0xFF4CAF50) else Color(0xFFF44336)
@@ -190,6 +213,47 @@ fun SpeakRepeatGameScreen(onBack: () -> Unit = {}) {
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
+                }
+
+                // 兜底：没法语音识别时由家长自评
+                if (showSelfCheck) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "听不清？让爸爸妈妈帮忙判断一下",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF8D6E63)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = {
+                                        viewModel.markSelfResult(true)
+                                        showSelfCheck = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF4CAF50)
+                                    )
+                                ) {
+                                    Text("读对了")
+                                }
+                                OutlinedButton(
+                                    onClick = {
+                                        viewModel.markSelfResult(false)
+                                        showSelfCheck = false
+                                    }
+                                ) {
+                                    Text("再读一次")
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))

@@ -12,15 +12,19 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import android.widget.Toast
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
+import com.pinyinpark.data.rememberUserProgressRepository
 import com.pinyinpark.model.*
 import com.pinyinpark.viewmodel.*
+import kotlinx.coroutines.launch
 
 // ============================================================
 // 主页面 - 拼音乐园首页
@@ -36,6 +40,12 @@ fun HomeScreen(
     onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // 真实存档：星星、连续天数、已学知识点、宠物状态
+    val repository = rememberUserProgressRepository()
+    val progress by repository.progress.collectAsState(initial = UserProgress())
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -62,7 +72,7 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             // 用户进度卡片
-            UserProgressCard(uiState.userProgress)
+            UserProgressCard(progress)
 
             // 学习章节区域
             SectionTitle("📚 学习章节")
@@ -74,6 +84,7 @@ fun HomeScreen(
                 items(uiState.chapters) { chapter ->
                     ChapterCard(
                         chapter = chapter,
+                        completedCount = chapter.pinyinItems.count { progress.completedItems.contains(it.id) },
                         onClick = { onChapterClick(chapter) }
                     )
                 }
@@ -95,9 +106,12 @@ fun HomeScreen(
             // 宠物养成区
             SectionTitle("🐰 我的小宠物")
             PetCard(
-                petLevel = uiState.userProgress.petLevel,
-                hunger = uiState.petHunger,
-                onFeed = { viewModel.feedPet() }
+                petLevel = progress.petLevel,
+                hunger = progress.petHunger,
+                onFeed = {
+                    scope.launch { repository.feedPet() }
+                    Toast.makeText(context, "小拼吃得很开心！🍎", Toast.LENGTH_SHORT).show()
+                }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -158,7 +172,14 @@ fun BadgeIcon(emoji: String, label: String) {
 // ============================================================
 
 @Composable
-fun ChapterCard(chapter: LessonChapter, onClick: () -> Unit) {
+fun ChapterCard(
+    chapter: LessonChapter,
+    completedCount: Int = chapter.completedCount,
+    onClick: () -> Unit
+) {
+    val progressPercent = if (chapter.totalCount == 0) 0f
+    else completedCount.toFloat() / chapter.totalCount
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,13 +214,13 @@ fun ChapterCard(chapter: LessonChapter, onClick: () -> Unit) {
 
                 // 进度条
                 LinearProgressIndicator(
-                    progress = { chapter.progressPercent },
+                    progress = { progressPercent },
                     modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
                     color = Color(0xFF4CAF50),
                     trackColor = Color(0xFFE0E0E0)
                 )
                 Text(
-                    "${chapter.completedCount}/${chapter.totalCount} 已学",
+                    "$completedCount/${chapter.totalCount} 已学",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )

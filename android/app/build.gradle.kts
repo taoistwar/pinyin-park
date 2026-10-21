@@ -119,6 +119,9 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.core:core:1.12.0")
 
+    // 本地存档（DataStore）
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

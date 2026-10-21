@@ -56,7 +56,14 @@ data class UserProgress(
     val unlockedBadges: Set<String> = emptySet(),
     val petLevel: Int = 1,
     val petHunger: Int = 100,      // 宠物饱食度 0-100
-    val lastLearnDate: Long = 0L
+    val lastLearnDate: Long = 0L,  // 上次学习时间戳（毫秒）
+    // --- 成就统计 ---
+    val totalLearned: Int = 0,     // 累计学过的知识点次数
+    val completedChapters: Int = 0,
+    val gamesPlayed: Int = 0,
+    val gameWins: Int = 0,
+    val perfectGames: Int = 0,
+    val hasSpoken: Boolean = false // 是否完成过语音跟读
 )
 
 /**

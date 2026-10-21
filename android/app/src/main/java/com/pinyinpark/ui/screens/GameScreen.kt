@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
+import com.pinyinpark.data.rememberUserProgressRepository
 import com.pinyinpark.model.*
 import com.pinyinpark.util.AudioPlayerManager
 import com.pinyinpark.viewmodel.*
@@ -42,7 +43,8 @@ fun LearnScreen(
     DisposableEffect(audioPlayer) {
         onDispose { audioPlayer.release() }
     }
-    val viewModel = remember(chapter.id) { LearnViewModel(chapter, audioPlayer) }
+    val repository = rememberUserProgressRepository()
+    val viewModel = remember(chapter.id) { LearnViewModel(chapter, audioPlayer, repository) }
     val uiState by viewModel.uiState.collectAsState()
 
     // 设备缺少中文语音引擎时提示一次
@@ -348,6 +350,7 @@ fun MatchGameScreen(
 
     // 防沉迷管理器
     val antiAddictionManager = remember { AntiAddictionManager() }
+    val repository = rememberUserProgressRepository()
     val antiAddictionState by antiAddictionManager.state.collectAsState()
     val challenge by antiAddictionManager.challenge.collectAsState()
 
@@ -356,10 +359,13 @@ fun MatchGameScreen(
         antiAddictionManager.startSession()
     }
 
-    // 游戏完成时通知防沉迷系统
+    // 游戏完成时通知防沉迷系统，并把结果写入本地存档
     LaunchedEffect(uiState.isGameOver) {
         if (uiState.isGameOver) {
             antiAddictionManager.onGameCompleted()
+            uiState.result?.let { result ->
+                repository.recordGame(result.starsEarned, result.isPerfect)
+            }
         }
     }
 

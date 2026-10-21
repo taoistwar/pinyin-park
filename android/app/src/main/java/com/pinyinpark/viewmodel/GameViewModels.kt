@@ -338,6 +338,19 @@ class SpeakRepeatViewModel(
         )
     }
 
+    /**
+     * 兜底评分：设备没有语音识别时，由家长/孩子自己判断刚才读得对不对
+     */
+    fun markSelfResult(isCorrect: Boolean) {
+        applySpeechResult(
+            SpeechResult(
+                recognizedText = if (isCorrect) "自评：读对了" else "自评：再读一次",
+                isCorrect = isCorrect,
+                confidence = if (isCorrect) 1f else 0.5f
+            )
+        )
+    }
+
     private fun applySpeechResult(result: SpeechResult) {
         val state = _uiState.value
         _uiState.update {

@@ -9,10 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -22,31 +20,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pinyinpark.viewmodel.AchievementViewModel
-import com.pinyinpark.viewmodel.BadgeWithStatus
-import com.pinyinpark.viewmodel.TrophyWithStatus
+import com.pinyinpark.data.BadgeRules
+import com.pinyinpark.data.rememberUserProgressRepository
+import com.pinyinpark.model.Badge
+import com.pinyinpark.model.PinyinData
+import com.pinyinpark.model.UserProgress
+import com.pinyinpark.viewmodel.ALL_TROPHIES
+import com.pinyinpark.viewmodel.Trophy
 
 // ============================================================
-// 勋章墙
+// 勋章墙（读取本地存档，实时展示解锁状态与进度）
 // ============================================================
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgesScreen(onBack: () -> Unit = {}) {
-    val viewModel = remember { AchievementViewModel() }
-    val uiState by viewModel.uiState.collectAsState()
+    val repository = rememberUserProgressRepository()
+    val progress by repository.progress.collectAsState(initial = UserProgress())
 
-    // 目前还没有本地存档，用首页的示例进度初始化徽章解锁状态
-    LaunchedEffect(Unit) {
-        viewModel.updateLearningProgress(
-            totalLearned = 12,
-            streakDays = 3,
-            perfectScores = 0
-        )
-    }
-
-    val unlockedBadges = uiState.badges.count { it.isUnlocked }
-    val unlockedTrophies = uiState.trophies.count { it.isUnlocked }
+    val badges = PinyinData.allBadges
+    val unlockedBadges = badges.count { BadgeRules.progressOf(it, progress) >= 1f }
+    val unlockedTrophies = ALL_TROPHIES.count { BadgeRules.trophyProgressOf(progress, it) >= 1f }
 
     Scaffold(
         topBar = {
@@ -71,7 +65,7 @@ fun BadgesScreen(onBack: () -> Unit = {}) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "徽章 $unlockedBadges / ${uiState.badges.size}　奖杯 $unlockedTrophies / ${uiState.trophies.size}",
+                text = "徽章 $unlockedBadges / ${badges.size}　奖杯 $unlockedTrophies / ${ALL_TROPHIES.size}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFF8D6E63)
             )
@@ -80,10 +74,14 @@ fun BadgesScreen(onBack: () -> Unit = {}) {
 
             BadgesSectionTitle("🎖️ 成就徽章")
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                uiState.badges.chunked(2).forEach { rowBadges ->
+                badges.chunked(2).forEach { rowBadges ->
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         rowBadges.forEach { badge ->
-                            BadgeCard(badge, Modifier.weight(1f))
+                            BadgeCard(
+                                badge = badge,
+                                progress = progress,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                         if (rowBadges.size == 1) {
                             Spacer(modifier = Modifier.weight(1f))
@@ -96,8 +94,8 @@ fun BadgesScreen(onBack: () -> Unit = {}) {
 
             BadgesSectionTitle("🏆 奖杯收藏")
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                uiState.trophies.forEach { trophy ->
-                    TrophyRow(trophy)
+                ALL_TROPHIES.forEach { trophy ->
+                    TrophyRow(trophy = trophy, progress = progress)
                 }
             }
 
@@ -118,8 +116,10 @@ private fun BadgesSectionTitle(title: String) {
 }
 
 @Composable
-private fun BadgeCard(badge: BadgeWithStatus, modifier: Modifier = Modifier) {
-    val unlocked = badge.isUnlocked
+private fun BadgeCard(badge: Badge, progress: UserProgress, modifier: Modifier = Modifier) {
+    val value = BadgeRules.progressOf(badge, progress)
+    val unlocked = value >= 1f
+
     Card(
         modifier = modifier.alpha(if (unlocked) 1f else 0.5f),
         colors = CardDefaults.cardColors(
@@ -133,25 +133,25 @@ private fun BadgeCard(badge: BadgeWithStatus, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (unlocked) badge.badge.iconEmoji else "🔒",
+                text = if (unlocked) badge.iconEmoji else "🔒",
                 fontSize = 28.sp
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = badge.badge.title,
+                text = badge.title,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = badge.badge.description,
+                text = badge.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(6.dp))
             LinearProgressIndicator(
-                progress = { badge.progress },
+                progress = { value },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
@@ -164,8 +164,10 @@ private fun BadgeCard(badge: BadgeWithStatus, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TrophyRow(trophy: TrophyWithStatus) {
-    val unlocked = trophy.isUnlocked
+private fun TrophyRow(trophy: Trophy, progress: UserProgress) {
+    val value = BadgeRules.trophyProgressOf(progress, trophy)
+    val unlocked = value >= 1f
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -185,26 +187,26 @@ private fun TrophyRow(trophy: TrophyWithStatus) {
                     .background(if (unlocked) Color(0xFFFFE0B2) else Color(0xFFE0E0E0)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = if (unlocked) trophy.trophy.emoji else "🔒", fontSize = 18.sp)
+                Text(text = if (unlocked) trophy.emoji else "🔒", fontSize = 18.sp)
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = trophy.trophy.name,
+                    text = trophy.name,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = trophy.trophy.description,
+                    text = trophy.description,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
             }
 
             Text(
-                text = if (unlocked) "已获得" else "${(trophy.progress * 100).toInt()}%",
+                text = if (unlocked) "已获得" else "${(value * 100).toInt()}%",
                 style = MaterialTheme.typography.bodySmall,
                 color = if (unlocked) Color(0xFF4CAF50) else Color.Gray
             )

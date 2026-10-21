@@ -352,6 +352,27 @@ data class Trophy(
 
 enum class TrophyType { LEARNING, GAME, SPECIAL }
 
+/**
+ * 全部奖杯定义（成就系统与勋章墙共用）
+ */
+val ALL_TROPHIES: List<Trophy> = listOf(
+    // 学习类奖杯
+    Trophy("trophy_learn_10", "拼音小助手", "学习10个拼音", "📚", 10, TrophyType.LEARNING),
+    Trophy("trophy_learn_50", "拼音爱好者", "学习50个拼音", "📖", 50, TrophyType.LEARNING),
+    Trophy("trophy_learn_100", "拼音达人", "学习100个拼音", "🎓", 100, TrophyType.LEARNING),
+    Trophy("trophy_master_all", "拼音大师", "学会所有拼音", "👨‍🎓", 200, TrophyType.LEARNING),
+
+    // 游戏类奖杯
+    Trophy("trophy_game_win", "初战告捷", "游戏获胜1次", "🎮", 1, TrophyType.GAME),
+    Trophy("trophy_game_master", "游戏王者", "游戏获胜50次", "🏆", 50, TrophyType.GAME),
+    Trophy("trophy_perfect", "完美主义", "获得10次满分", "💯", 10, TrophyType.GAME),
+
+    // 特殊奖杯
+    Trophy("trophy_streak_3", "三天坚持", "连续学习3天", "🔥", 3, TrophyType.SPECIAL),
+    Trophy("trophy_streak_7", "一周坚持", "连续学习7天", "🌟", 7, TrophyType.SPECIAL),
+    Trophy("trophy_dedicated", "学习达人", "累计学习100次", "⭐", 100, TrophyType.SPECIAL)
+)
+
 class AchievementViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(AchievementUiState())
@@ -380,23 +401,7 @@ class AchievementViewModel : ViewModel() {
         }
     }
 
-    private fun getAllTrophies(): List<Trophy> = listOf(
-        // 学习类奖杯
-        Trophy("trophy_learn_10", "拼音小助手", "学习10个拼音", "📚", 10, TrophyType.LEARNING),
-        Trophy("trophy_learn_50", "拼音爱好者", "学习50个拼音", "📖", 50, TrophyType.LEARNING),
-        Trophy("trophy_learn_100", "拼音达人", "学习100个拼音", "🎓", 100, TrophyType.LEARNING),
-        Trophy("trophy_master_all", "拼音大师", "学会所有拼音", "👨‍🎓", 200, TrophyType.LEARNING),
-
-        // 游戏类奖杯
-        Trophy("trophy_game_win", "初战告捷", "游戏获胜1次", "🎮", 1, TrophyType.GAME),
-        Trophy("trophy_game_master", "游戏王者", "游戏获胜50次", "🏆", 50, TrophyType.GAME),
-        Trophy("trophy_perfect", "完美主义", "获得10次满分", "💯", 10, TrophyType.GAME),
-
-        // 特殊奖杯
-        Trophy("trophy_streak_3", "三天坚持", "连续学习3天", "🔥", 3, TrophyType.SPECIAL),
-        Trophy("trophy_streak_7", "一周坚持", "连续学习7天", "🌟", 7, TrophyType.SPECIAL),
-        Trophy("trophy_dedicated", "学习达人", "累计学习100次", "⭐", 100, TrophyType.SPECIAL)
-    )
+    private fun getAllTrophies(): List<Trophy> = ALL_TROPHIES
 
     /**
      * 更新学习进度

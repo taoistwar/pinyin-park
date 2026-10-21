@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pinyinpark.data.UserProgressRepository
 import com.pinyinpark.model.*
 import com.pinyinpark.util.AudioPlayerManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,19 +112,7 @@ class HomeViewModel : ViewModel() {
         // 导航到章节详情（由导航层处理）
     }
 
-    /**
-     * 喂食宠物：提升饱食度并给出反馈
-     */
-    fun feedPet() {
-        _uiState.update { state ->
-            val newHunger = minOf(100, state.petHunger + 20)
-            state.copy(
-                petHunger = newHunger,
-                showCelebration = true,
-                celebrationMessage = "小拼吃饱啦！饱食度 $newHunger%"
-            )
-        }
-    }
+
 
     fun dismissCelebration() {
         _uiState.update { it.copy(showCelebration = false) }
@@ -145,7 +134,11 @@ data class LearnUiState(
     val audioUnavailable: Boolean = false  // 设备缺少中文语音引擎时提示一次
 )
 
-class LearnViewModel(private val chapter: LessonChapter, private val audioPlayer: AudioPlayerManager? = null) : ViewModel() {
+class LearnViewModel(
+    private val chapter: LessonChapter,
+    private val audioPlayer: AudioPlayerManager? = null,
+    private val repository: UserProgressRepository? = null
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LearnUiState())
     val uiState: StateFlow<LearnUiState> = _uiState.asStateFlow()
@@ -232,8 +225,14 @@ class LearnViewModel(private val chapter: LessonChapter, private val audioPlayer
                 )
             }
         } else {
-            // 章节完成
-            _uiState.update { it.copy(isCompleted = true, starsEarned = 3) }
+            // 章节完成：写入本地存档（星星、已学知识点、连续天数）
+            val stars = 3
+            _uiState.update { it.copy(isCompleted = true, starsEarned = stars) }
+            repository?.let { repo ->
+                viewModelScope.launch {
+                    repo.completeChapter(chapter, stars)
+                }
+            }
         }
     }
 

@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pinyinpark.data.rememberUserProgressRepository
 import com.pinyinpark.model.PinyinItem
 import com.pinyinpark.viewmodel.AntiAddictionManager
 import com.pinyinpark.viewmodel.HitEffectType
@@ -65,6 +66,7 @@ fun WhackMoleGameScreen(
 
     // 防沉迷：与其他游戏保持一致
     val antiAddictionManager = remember { AntiAddictionManager() }
+    val repository = rememberUserProgressRepository()
     val antiAddictionState by antiAddictionManager.state.collectAsState()
     val challenge by antiAddictionManager.challenge.collectAsState()
 
@@ -74,6 +76,9 @@ fun WhackMoleGameScreen(
     LaunchedEffect(uiState.isGameOver) {
         if (uiState.isGameOver) {
             antiAddictionManager.onGameCompleted()
+            uiState.result?.let { result ->
+                repository.recordGame(result.starsEarned, result.isPerfect)
+            }
         }
     }
 
