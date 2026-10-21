@@ -197,10 +197,18 @@ fun PinyinCard(item: PinyinItem, isPlaying: Boolean) {
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+                if (item.examplePinyin.isNotBlank()) {
+                    Text(
+                        text = item.examplePinyin,
+                        fontSize = 22.sp,
+                        maxLines = 1,
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
+                }
                 Text(
                     text = item.exampleWord,
-                    fontSize = 24.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    fontSize = 18.sp,
+                    color = Color.White.copy(alpha = 0.75f)
                 )
             }
 

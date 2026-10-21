@@ -270,12 +270,12 @@ object PinyinData {
         PinyinItem("an", "an", PinyinType.YUN_MU, "audio_an", "安", "ān"),
         PinyinItem("en", "en", PinyinType.YUN_MU, "audio_en", "恩", "ēn"),
         PinyinItem("in", "in", PinyinType.YUN_MU, "audio_in", "音", "yīn"),
-        PinyinItem("un", "un", PinyinType.YUN_MU, "audio_un", "云", "yún"),
-        PinyinItem("ün", "ün", PinyinType.YUN_MU, "audio_vn", "晕", "yùn"),
+        PinyinItem("un", "un", PinyinType.YUN_MU, "audio_un", "春", "chūn"),
+        PinyinItem("ün", "ün", PinyinType.YUN_MU, "audio_vn", "云", "yún"),
         PinyinItem("ang", "ang", PinyinType.YUN_MU, "audio_ang", "昂", "áng"),
-        PinyinItem("eng", "eng", PinyinType.YUN_MU, "audio_eng", "鹰", "yīng"),
+        PinyinItem("eng", "eng", PinyinType.YUN_MU, "audio_eng", "灯", "dēng"),
         PinyinItem("ing", "ing", PinyinType.YUN_MU, "audio_ing", "英", "yīng"),
-        PinyinItem("ong", "ong", PinyinType.YUN_MU, "audio_ong", "翁", "wēng")
+        PinyinItem("ong", "ong", PinyinType.YUN_MU, "audio_ong", "红", "hóng")
     )
 
     val shengDiaoList = listOf(

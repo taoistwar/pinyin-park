@@ -269,7 +269,12 @@ fun GameCard(gameType: GameType, onClick: () -> Unit) {
 // ============================================================
 
 @Composable
-fun PetCard(petLevel: Int, hunger: Int = 100, onFeed: () -> Unit = {}) {
+fun PetCard(
+    petLevel: Int,
+    hunger: Int = 100,
+    petName: String = "小拼",
+    onFeed: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -296,7 +301,7 @@ fun PetCard(petLevel: Int, hunger: Int = 100, onFeed: () -> Unit = {}) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("小兔子", style = MaterialTheme.typography.titleMedium)
+                Text(petName, style = MaterialTheme.typography.titleMedium)
                 Text("等级 Lv.$petLevel", color = Color(0xFF4CAF50))
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {

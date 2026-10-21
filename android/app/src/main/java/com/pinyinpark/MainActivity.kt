@@ -2,6 +2,7 @@ package com.pinyinpark
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,11 @@ sealed class AppScreen {
 @Composable
 fun PinyinParkApp() {
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
+
+    // 二级页面按系统返回键先回到首页，避免直接退出应用
+    BackHandler(enabled = currentScreen != AppScreen.Home) {
+        currentScreen = AppScreen.Home
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when (val screen = currentScreen) {

@@ -80,7 +80,7 @@ class HomeViewModel : ViewModel() {
         LessonChapter(
             id = 2,
             title = "韵母乐园",
-            description = "学会35个韵母",
+            description = "学会${PinyinData.yunMuList.size}个韵母",
             iconEmoji = "🎵",
             pinyinItems = PinyinData.yunMuList,
             isUnlocked = true  // 默认解锁

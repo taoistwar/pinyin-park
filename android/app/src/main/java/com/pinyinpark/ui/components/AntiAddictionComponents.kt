@@ -225,18 +225,24 @@ fun OptionButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier.height(60.dp),
+        // 选项是 4 个大写汉字，高度用 minHeight 而不是固定高度，避免换行后被裁切
+        modifier = modifier.heightIn(min = 60.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             disabledContainerColor = backgroundColor
         ),
         border = BorderStroke(3.dp, borderColor),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
     ) {
         Text(
             text = text,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
+            letterSpacing = 0.sp,
+            maxLines = 1,
+            softWrap = false,
+            textAlign = TextAlign.Center,
             color = if (isSelected || isCorrect == true || isWrong) Color.White else Color.Black
         )
     }
